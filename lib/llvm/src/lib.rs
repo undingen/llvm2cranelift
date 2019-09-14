@@ -17,5 +17,5 @@ mod string_table;
 mod translate;
 mod types;
 
-pub use module::SymbolKind;
+pub use module::{Module, SymbolKind};
 pub use translate::{create_llvm_context, read_llvm, translate_module};

@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use cranelift_codegen::ir;
 use cranelift_codegen::isa::TargetIsa;
 use std::fmt;
