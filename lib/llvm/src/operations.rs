@@ -809,13 +809,19 @@ fn translate_intr_libcall(
         ));
     }
 
-    let name = strings.get_extname(name);
+    let libcall = match name {
+        "memset" => ir::LibCall::Memset,
+        "memcpy" => ir::LibCall::Memcpy,
+        "memmove" => ir::LibCall::Memmove,
+        _ => panic!("not handled {}", name)
+    };
+
     let signature = ctx.builder.import_signature(translate_sig(
         unsafe { LLVMGetElementType(LLVMTypeOf(llvm_callee)) },
         ctx.dl,
     ));
     let data = ir::ExtFuncData {
-        name,
+        name: ir::ExternalName::LibCall(libcall),
         signature,
         colocated: false, // TODO: Set the colocated flag based on the visibility.
     };
@@ -858,7 +864,13 @@ fn translate_mem_intrinsic(
     // start optimizing these libcalls.
     let args = [dst_arg, src_arg, len_arg];
 
-    let funcname = strings.get_extname(name);
+    let libcall = match name {
+        "memcpy" => ir::LibCall::Memcpy,
+        "memmove" => ir::LibCall::Memmove,
+        "memset" => ir::LibCall::Memset,
+        _ => panic!("not handled {}", name)
+    };
+
     // TODO: Translate the calling convention.
     let mut sig = ir::Signature::new(CallConv::SystemV);
     sig.params.resize(3, ir::AbiParam::new(pointer_type));
@@ -868,7 +880,7 @@ fn translate_mem_intrinsic(
     sig.returns.resize(1, ir::AbiParam::new(pointer_type));
     let signature = ctx.builder.import_signature(sig);
     let data = ir::ExtFuncData {
-        name: funcname,
+        name: ir::ExternalName::LibCall(libcall),
         signature,
         colocated: false, // TODO: Set the colocated flag based on the visibility.
     };
