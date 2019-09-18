@@ -1,7 +1,5 @@
 //! Translator from LLVM IR to Cranelift IL.
 
-#![deny(missing_docs)]
-
 extern crate cranelift_codegen;
 extern crate cranelift_frontend;
 extern crate fnv;
@@ -17,5 +15,6 @@ mod string_table;
 mod translate;
 mod types;
 
+pub use module::Module;
 pub use module::SymbolKind;
 pub use translate::{create_llvm_context, read_llvm, translate_module};
