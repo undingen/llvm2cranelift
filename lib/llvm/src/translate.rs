@@ -197,6 +197,19 @@ pub fn translate_global(
                 contents.push(0u8);
             }
         }
+        LLVMConstantDataArrayValueKind => {
+            let elt_coult: u64 = unsafe { LLVMGetArrayLength(llvm_ty) } as u64;
+            for i in 0..elt_coult {
+                let cnst = unsafe { LLVMGetElementAsConstant(llvm_init, i as u32) };
+
+                let raw = unsafe { LLVMConstIntGetSExtValue(cnst) };
+                let mut part = raw;
+                for _ in 0..size/elt_coult {
+                    contents.push((part & 0xff) as u8);
+                    part >>= 8; 
+                }
+            }
+        }
         _ => panic!(
             "unimplemented constant initializer value kind: {:?}",
             llvm_kind
